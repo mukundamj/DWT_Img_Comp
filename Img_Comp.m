@@ -5,10 +5,10 @@ clc;
 fprintf('Starting Image compression using EZW technique\n');
 
 %Scaling for wavelet decomposition
-scale = 8;
-ip_img_name = 'lena512.bmp';
+ip_img_name = 'lena8.bmp';
 ip_img = double(imread(ip_img_name));
 %Wavelet decomposition 
+scale = log2(size(ip_img,1));
 [WC,S] = wavedec2(ip_img,scale,'db1');
 
 fprintf('Wavelet co-efficients calcutlated for sacle of %d \n',scale);
@@ -50,12 +50,28 @@ for i=2:1:len-1
 end
 
 imwrite(WM,'lena_r1.bmp','bmp');
-% Finding the LH part
 
-% Finding the HH part
+wavImg = WM;
 
- %Dominant pass
- 
+%minimum threshold- When the maximum wavelet co-efficient is less than this threshold,wavelet encoding will be stopped.
+
+min_threshols = 50;
+
+%Morton scanning: The the wavelet matrix is scanned in the morton scanning
+%order.
+
+N = size(wavImg,1);
+%Number of bits required to represent the image
+nOfBits = log2(N*N);
+%Pixel locations from 0 to N^2-1.
+matLoc = 0: (N*N)-1;
+%Pixel locations in binary
+binLoc = dec2bin(matLoc(:),nOfBits);
+%finding morton scan order
+scanOrder = [bin2dec(binLoc(:,(1:2:nOfBits-1))),bin2dec(binLoc(:,2:2:nOfBits))];
+
+%Dominant pass
+[significantMat, subordinateList,newMat] = domPass(
  
  %Subordinate pass
  
